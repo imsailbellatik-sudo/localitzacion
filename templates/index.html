@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Location Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        .header {
+            background: linear-gradient(to right, #833ab4, #fd1d1d, #fcb045);
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .input-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input:focus {
+            border-color: #833ab4;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(131, 58, 180, 0.1);
+        }
+        
+        button {
+            background: linear-gradient(to right, #833ab4, #fd1d1d);
+            color: white;
+            border: none;
+            padding: 16px;
+            width: 100%;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(131, 58, 180, 0.3);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .result {
+            margin-top: 30px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        
+        .result.show {
+            display: block;
+        }
+        
+        .result-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .result-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .result-label {
+            font-weight: 600;
+            color: #555;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .result-value {
+            color: #333;
+            font-size: 16px;
+            word-break: break-all;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #833ab4;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .error {
+            color: #dc3545;
+            background: #f8d7da;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .error.show {
+            display: block;
+        }
+        
+        .disclaimer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Instagram Location Tracker</h1>
+            <p>Enter an Instagram username to retrieve real-time location data</p>
+        </div>
+        
+        <div class="content">
+            <div class="input-group">
+                <label for="username">Instagram Username</label>
+                <input type="text" id="username" placeholder="e.g., instagram_user" autocomplete="off">
+            </div>
+            
+            <button onclick="trackUser()">
+                <span>Track Location</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.13 15.87 2 12 2ZM12 11.5C10.62 11.5 9.5 10.38 9.5 9C9.5 7.62 10.62 6.5 12 6.5C13.38 6.5 14.5 7.62 14.5 9C14.5 10.38 13.38 11.5 12 11.5Z" fill="white"/>
+                </svg>
+            </button>
+            
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Tracking user location...</p>
+            </div>
+            
+            <div class="error" id="error"></div>
+            
+            <div class="result" id="result">
+                <div class="result-item">
+                    <div class="result-label">Target Username</div>
+                    <div class="result-value" id="result-username">-</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">IP Address</div>
+                    <div class="result-value" id="result-ip">-</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Location</div>
+                    <div class="result-value" id="result-location">-</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Coordinates</div>
+                    <div class="result-value" id="result-coordinates">-</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Accuracy</div>
+                    <div class="result-value" id="result-accuracy">-</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Last Active</div>
+                    <div class="result-value" id="result-lastactive">-</div>
+                </div>
+            </div>
+            
+            <div class="disclaimer">
+                This tool is for educational purposes only. Always respect privacy laws and obtain proper authorization.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function trackUser() {
+            const username = document.getElementById('username').value.trim();
+            const errorDiv = document.getElementById('error');
+            const loadingDiv = document.getElementById('loading');
+            const resultDiv = document.getElementById('result');
+            
+            // Reset
+            errorDiv.classList.remove('show');
+            resultDiv.classList.remove('show');
+            
+            if (!username) {
+                showError('Please enter an Instagram username');
+                return;
+            }
+            
+            // Show loading
+            loadingDiv.classList.add('show');
+            
+            try {
+                // Send request to backend
+                const response = await fetch('/track', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username })
+                });
+                
+                const data = await response.json();
+                
+                // Hide loading
+                loadingDiv.classList.remove('show');
+                
+                if (data.success) {
+                    // Update result fields
+                    document.getElementById('result-username').textContent = data.username;
+                    document.getElementById('result-ip').textContent = data.ip;
+                    document.getElementById('result-location').textContent = data.location;
+                    document.getElementById('result-coordinates').textContent = data.coordinates;
+                    document.getElementById('result-accuracy').textContent = data.accuracy;
+                    document.getElementById('result-lastactive').textContent = data.last_active;
+                    
+                    // Show result
+                    resultDiv.classList.add('show');
+                } else {
+                    showError(data.error || 'Tracking failed');
+                }
+            } catch (error) {
+                loadingDiv.classList.remove('show');
+                showError('Network error. Please try again.');
+            }
+        }
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.classList.add('show');
+        }
+    </script>
+</body>
+</html>
